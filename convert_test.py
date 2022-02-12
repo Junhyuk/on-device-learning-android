@@ -7,40 +7,14 @@ from tfltransfer import optimizers
 from tfltransfer.tflite_transfer_converter import TFLiteTransferConverter
 import tensorflow.keras.backend as K
 
-#tf.compat.v1.disable_v2_behavior()
-#tf.compat.v1.disable_eager_execution()
-#tf.compat.v1.disable_eager_execution()
-#tf.compat.v1.disable_v2_behavior()
-#tf.compat.v1.enable_eager_execution()
-#tf.disable_v2_behavior()
-
-
 DEFAULT_BATCH_SIZE = 32
 
 input_size = 224
 output_size = 5
 
 DEFAULT_INPUT_SIZE = 64
-DEFAULT_BATCH_SIZE = 128
+DEFAULT_BATCH_SIZE = 16
 LEARNING_RATE = 0.001
-
-'''
-batch_size = DEFAULT_BATCH_SIZE
-
-base = bases.MobileNetV2Base(image_size=input_size)
-head = heads.SoftmaxClassifierHead(batch_size, base.bottleneck_shape(),
-                                   output_size)
-optimizer = optimizers.SGD(LEARNING_RATE)
-
-converter = TFLiteTransferConverter(
-    output_size, base, head, optimizer, batch_size)
-
-
-
-
-models = converter.convert_and_save('custom_keras_model')
-#parameter_shapes = [(7 * 7 * 1280, output_size), (output_size,)]
-'''
 
 def test_mobilenet_v2_saved_model():
     input_size = DEFAULT_INPUT_SIZE
@@ -69,13 +43,11 @@ def test_mobilenet_v2_saved_model():
     ])
 
     head_model.compile(loss="categorical_crossentropy", optimizer="sgd")
-
-    #head_model.compile(loss='categorical_crossentropy', optimizer='sgd')
     converter = TFLiteTransferConverter(
         output_size, base, heads.KerasModelHead(head_model),
         optimizers.SGD(LEARNING_RATE), DEFAULT_BATCH_SIZE)
 
-    models = converter.convert_and_save('custom_keras_model_220208')
+    models = converter.convert_and_save('custom_keras_on_device_model')
     models = converter._convert()
 
 test_mobilenet_v2_saved_model()
